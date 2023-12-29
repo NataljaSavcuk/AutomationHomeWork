@@ -1,17 +1,17 @@
 import Register from './registration.page.js'
 import Admin from './admin.page.js'
 
+
 describe('Homework', async () => {
 
-   
    describe ('Registration page', async() =>{
    
     beforeEach (async() => {
         await Register.open();
     });
 
-       it('should open page and create screenshot', async () => {
-        await browser.saveScreenshot('registration_page.png');
+    it('should open page and create screenshot', async () => {
+        await browser.saveScreenshot('./test/specs/homework/registration_page.png');
         await browser.pause(2000);
     });
     it ('should show the registration page', async () => {
@@ -30,10 +30,13 @@ describe('Homework', async () => {
 
     describe ('New user registration', async() => {
         
-        const name = 'Lorem Ipsum';
+        const name = `Tester ${Register.generateString(8)}`;
 
-        it('should register new user account with valid credentials', async () => {
+        before(async() => {
             await Register.open();
+        })
+
+        it('should register new user account with valid credentials', async () => {            
             const email = Register.generateString(8)+'@test.com';
             const password = Register.generateString(8);
             await Register.registrationNewUser(name, email, password);
@@ -41,22 +44,24 @@ describe('Homework', async () => {
         });
 
         after(async() => {
-            await Admin.open();
             const adminEmail = 'da-app.master@czechitas.cz';
             const adminPassword = 'AppRoot123';
+            await Admin.open();
             await Admin.login(adminEmail, adminPassword);
             await Admin.openUsersList();
-            await Admin.userDelete(name);
+            await Admin.userDelete(name);            
+            await Admin.logout();
         });
     });
 
     describe('Invalid registration', async() => {
+       
         beforeEach (async() => {
             await Register.open();
            });
 
-           it('should not register new user account with the same email', async () => {
-            const name = Register.generateString(5)+ ' ' + Register.generateString(7);
+        it('should not register new user account with the same email', async () => {
+            const name = `${Register.generateString(5)} ${Register.generateString(7)}`;
             const email = 'da-app.admin@czechitas.cz';
             const password = Register.generateString(10);
             await Register.registrationNewUser(name, email, password);
@@ -64,11 +69,12 @@ describe('Homework', async () => {
         });
 
         it('should not register new user account with invalid password', async () => {
-            const name = Register.generateString(5)+ ' ' + Register.generateString(7);
-            const email = Register.generateString(6)+'@test.com';
-            const password = '123456';
+            const name = `${Register.generateString(5)} ${Register.generateString(7)}`;
+            const email = `${Register.generateString(6)}@test.com`;
+            const password = '12345678';
             await Register.registrationNewUser(name, email, password);
             await expect(Register.errorMessage).toBeDisplayed();
         });
     })
+
 });

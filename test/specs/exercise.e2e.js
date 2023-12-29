@@ -1,17 +1,63 @@
 import {username, password} from './fixtures.js'
-// import LoginPage from '../pageobjects/login.page'
-// import ApplicationsPage from '../pageobjects/applications.page'
 
-describe('Czechitas Login Page', async () => {
+describe('Login And Applications Page', async () => {
 
-    it('should open login page', async () => {
+    it('should login and list applications', async () => {
 
         await browser.reloadSession();
 
         await browser.url('/prihlaseni');
 
-        await browser.pause(5000);
+        // zjištění stavu políčka email
+        const emailField = $('#email');
+        console.log('Email field s displayed: ' + await emailField.isDisplayed());
+        console.log('Email field s enabled: ' + await emailField.isEnabled());
 
+        // zjištění stavu políčka password
+        const passwordField = $('#password');
+        console.log('Password field s displayed: ' + await passwordField.isDisplayed());
+        console.log('Password field s enabled: ' + await passwordField.isEnabled());
+
+        // výpis textu tlačítka na přihlášení
+        const loginButton = $('.btn-primary');
+        console.log('Login button text: ' + await loginButton.getText());
+
+        // výpis atributu href odkazu a zapomenuté heslo
+        const link = $('form').$('a').getAttribute('href');
+        console.log('Forgot password? link: ' + await link);
+
+        // přihlášení
+        await emailField.setValue(username);
+        await passwordField.setValue(password);
+        await loginButton.click();
+
+        // Vypiš jméno přihlášeného uživatele
+        const currentUser = $('.navbar-right').$('strong').getText()
+        console.log(await currentUser);
+
+        // přechod na stránku s kurzy
+        await $('=Přihlášky').click();
+       // await browser.pause(1000);
+       await $("#DataTables_Table_0_processing").waitForDisplayed();
+       await $("#DataTables_Table_0_processing").waitForDisplayed({ reverse: true});
+
+        // page title text check
+       // console.log('Page title is: ' + await $('h1').getText()) // TODO upravit cviceni
+
+        // výpis přihlášených kurzů
+        const rows = await $('tbody').$$('tr');
+        // console.log('There are ' + rows.length + ' rows in the table');
+        // for (const row of rows) {
+        //     const rowText = await row.getText()
+        //     console.log(rowText);
+        // }
+        rows.forEach(async (row) => {
+            console.log(await row.getText());
+        })
+
+        for await (const row of rows) {
+            console.log(await row.getText());
+        }
     });
 
-});
+});   

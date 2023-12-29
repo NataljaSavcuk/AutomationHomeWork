@@ -1,31 +1,24 @@
 
+import BasicUser from "./basic.page.js";
 
-class Admin {
+class Admin extends BasicUser {
 
-    get fieldEmail() { return $('#email'); };
-    get fieldPassword() { return $('#password'); };
-    get buttonConfirm() { return $('.btn-primary'); };
     get fieldSearch() { return $('[type="search"]');}; 
     get buttonDelete() { return $('.fa-trash');};
     get buttonUserDelete() { return $('.btn-sm');};
     get buttonSubmit() { return $('[type="submit"]');};
-    
+    get loading() {return $('#DataTables_Table_0_processing');};
+    //open web on login form
     async open() {
         await browser.reloadSession();
         await browser.url('/prihlaseni');
     };
-   
-    async login(username, password) {
-        await this.fieldEmail.setValue(username);
-        await this.fieldPassword.setValue(password);
-        await this.buttonConfirm.click();
-    };
-
+   //open list of all registered users
     async openUsersList() {
         await browser.url('/admin/uzivatele')
-        await $('#DataTables_Table_0_processing').waitForDisplayed({ reverse: true});
+        await this.loading.waitForDisplayed({ reverse: true});
     };
-
+    //find user by name and delete the user
     async userDelete (userName) {
         await this.fieldSearch.setValue(userName);
         await browser.pause(2000);
